@@ -36,6 +36,8 @@ export class CdkIlluminationsStack extends cdk.Stack {
       }],
     });
 
+    // TODO: この Lambda と DynamoDB は現時点では何もしない。
+    // いい感じのロジックが思いついたら更新する。
     const writeFunction = new lambda.Function(this, 'WriteFunction', {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda/')),
       handler: 'write_function.handler',
