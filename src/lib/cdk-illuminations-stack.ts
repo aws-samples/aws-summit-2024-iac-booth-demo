@@ -3,11 +3,16 @@ import * as cdk from 'aws-cdk-lib';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as ecs from 'aws-cdk-lib/aws-ecs';
+import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { NodejsBuild } from 'deploy-time-build';
+
+
 
 
 export interface CdkIlluminationsStackProps extends cdk.StackProps { }
@@ -57,6 +62,15 @@ export class CdkIlluminationsStack extends cdk.Stack {
     dynamoTable.grantReadData(readFunction);
     dynamoTable.grantReadWriteData(writeFunction);
 
+    const vpc = new ec2.Vpc(this, 'Vpc', {});
+    const cluster = new ecs.Cluster(this, 'Cluster', { vpc });
+    const loadBalancedFargateService = new ApplicationLoadBalancedFargateService(this, 'Service', {
+      cluster,
+      taskImageOptions: {
+        image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
+      },
+    });
+
     const api = new apigateway.RestApi(this, 'RestApi');
     api.root.addMethod(
       'ANY',
@@ -89,10 +103,12 @@ export class CdkIlluminationsStack extends cdk.Stack {
       buildCommands: ['npm ci', 'npm run build'],
       buildEnvironment: {
         VITE_API_ENDPOINT: api.url,
+        ALB_API_ENDPOINT: loadBalancedFargateService.loadBalancer.loadBalancerDnsName,
       },
       nodejsVersion: 20,
     });
 
     new cdk.CfnOutput(this, 'DistributionDomainName', { value: distribution.distributionDomainName });
+    new cdk.CfnOutput(this, 'ServiceAlbEndpoint', { value: loadBalancedFargateService.loadBalancer.loadBalancerDnsName });
   }
 }

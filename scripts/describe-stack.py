@@ -8,7 +8,9 @@ target_stack_name = 'CdkIlluminations'
 
 # 監視対象のリソースタイプ
 target_resource_type = ['AWS::Lambda::Function', 'AWS::S3::Bucket',
-                        'AWS::CloudFront::Distribution', 'AWS::DynamoDB::Table', 'AWS::ApiGateway::RestApi',]
+                        'AWS::CloudFront::Distribution', 'AWS::DynamoDB::Table', 'AWS::ApiGateway::RestApi',
+                        'AWS::EC2::VPC', 'AWS::ECS::Cluster', 'AWS::ElasticLoadBalancingV2::LoadBalancer',
+                        'AWS::ECS::Service']
 # 自動的に作成される Lambda 関数は監視対象に含めたくない
 exclude_logical_resource_keywords = ['Custom']
 
