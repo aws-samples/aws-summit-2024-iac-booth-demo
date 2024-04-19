@@ -103,12 +103,11 @@ export class CdkIlluminationsStack extends cdk.Stack {
       buildCommands: ['npm ci', 'npm run build'],
       buildEnvironment: {
         VITE_API_ENDPOINT: api.url,
-        ALB_API_ENDPOINT: loadBalancedFargateService.loadBalancer.loadBalancerDnsName,
+        VITE_ALB_ENDPOINT: loadBalancedFargateService.loadBalancer.loadBalancerDnsName,
       },
       nodejsVersion: 20,
     });
 
     new cdk.CfnOutput(this, 'DistributionDomainName', { value: distribution.distributionDomainName });
-    new cdk.CfnOutput(this, 'ServiceAlbEndpoint', { value: loadBalancedFargateService.loadBalancer.loadBalancerDnsName });
   }
 }

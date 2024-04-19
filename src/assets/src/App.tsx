@@ -19,7 +19,7 @@ function App() {
           Your API endpoint: <code>{import.meta.env.VITE_API_ENDPOINT ?? 'undefined'}</code>
         </p>
         <p>
-          Your ALB endpoint: <code>{import.meta.env.ALB_API_ENDPOINT ?? 'undefined'}</code>
+          Your ALB endpoint: <code>{import.meta.env.VITE_ALB_ENDPOINT ?? 'undefined'}</code>
         </p>
         <p>
           <a
