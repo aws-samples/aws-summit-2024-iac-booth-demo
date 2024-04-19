@@ -13,8 +13,6 @@ import { Construct } from 'constructs';
 import { NodejsBuild } from 'deploy-time-build';
 
 
-
-
 export interface CdkIlluminationsStackProps extends cdk.StackProps { }
 
 export class CdkIlluminationsStack extends cdk.Stack {
