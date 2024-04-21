@@ -29,6 +29,7 @@
     "src/**/*.ts",
     "test/**/*.ts",
     "src/**/*.tsx",
+    "integ-tests/*.ts",
     ".projenrc.ts",
     "projenrc/**/*.ts"
   ],
