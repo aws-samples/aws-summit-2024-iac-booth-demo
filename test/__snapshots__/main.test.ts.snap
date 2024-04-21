@@ -128,7 +128,7 @@ exports[`Snapshot 1`] = `
             "sourceBucketName": {
               "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
             },
-            "sourceObjectKey": "3d7c722c9114c1de7895f06bb11d62a91df5f361e6cb556fe1e4a988241fa04c.zip",
+            "sourceObjectKey": "585ba3be66f638b5ef1740fe777e6128ee405a7f0defa9916a0554ce5d3256b3.zip",
           },
         ],
         "type": "NodejsBuild",
