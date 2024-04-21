@@ -68,10 +68,12 @@
     },
     {
       "name": "@aws-cdk/integ-runner",
+      "version": "^2.137.0-alpha.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/integ-tests-alpha",
+      "version": "^2.137.0-alpha.0",
       "type": "runtime"
     },
     {
