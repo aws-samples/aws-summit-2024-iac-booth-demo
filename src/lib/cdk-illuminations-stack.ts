@@ -93,6 +93,5 @@ export class CdkIlluminationsStack extends cdk.Stack {
       },
       nodejsVersion: 20,
     });
-
   }
 }
