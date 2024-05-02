@@ -13,31 +13,17 @@ import { Construct } from 'constructs';
 import { NodejsBuild } from 'deploy-time-build';
 
 
-export interface CdkIlluminationsStackProps extends cdk.StackProps { }
+export interface CdkIlluminationsStackProps extends cdk.StackProps {
+  readonly vpc: ec2.IVpc;
+  readonly deploymentBucket: s3.IBucket;
+  readonly distribution: cloudfront.IDistribution;
+}
 
 export class CdkIlluminationsStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props: CdkIlluminationsStackProps = {}) {
+  constructor(scope: Construct, id: string, props: CdkIlluminationsStackProps) {
     super(scope, id, props);
 
-    const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
-      autoDeleteObjects: true,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      encryption: s3.BucketEncryption.S3_MANAGED,
-    });
-    const deploymentPath = '/';
-
-    const originAccessIdentity = new cloudfront.OriginAccessIdentity(this, 'OriginAccessIdentity');
-
-    const distribution = new cloudfront.CloudFrontWebDistribution(this, 'Distribution', {
-      originConfigs: [{
-        s3OriginSource: {
-          s3BucketSource: deploymentBucket,
-          originAccessIdentity,
-        },
-        behaviors: [{ isDefaultBehavior: true }],
-      }],
-    });
+    const { vpc, deploymentBucket, distribution } = props;
 
     // TODO: この Lambda と DynamoDB は現時点では何もしない。
     // いい感じのロジックが思いついたら更新する。
@@ -60,7 +46,6 @@ export class CdkIlluminationsStack extends cdk.Stack {
     dynamoTable.grantReadData(readFunction);
     dynamoTable.grantReadWriteData(writeFunction);
 
-    const vpc = new ec2.Vpc(this, 'Vpc', {});
     const cluster = new ecs.Cluster(this, 'Cluster', { vpc });
     const loadBalancedFargateService = new ApplicationLoadBalancedFargateService(this, 'Service', {
       cluster,
@@ -68,8 +53,10 @@ export class CdkIlluminationsStack extends cdk.Stack {
         image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
       },
     });
+    const deregistrationDelay = cdk.Duration.seconds(5);
+    loadBalancedFargateService.targetGroup.setAttribute('deregistration_delay.timeout_seconds', deregistrationDelay.toSeconds().toString());
 
-    const api = new apigateway.RestApi(this, 'RestApi');
+    const api = new apigateway.RestApi(this, 'RestApi', {});
     api.root.addMethod(
       'ANY',
       new apigateway.MockIntegration({
@@ -86,6 +73,7 @@ export class CdkIlluminationsStack extends cdk.Stack {
     apiCount.addMethod('GET', new apigateway.LambdaIntegration(readFunction));
     apiCount.addMethod('POST', new apigateway.LambdaIntegration(writeFunction));
 
+    const deploymentPath = '/';
     const assetPath = path.join(__dirname, '../assets');
     new NodejsBuild(this, 'Build', {
       assets: [
@@ -106,6 +94,5 @@ export class CdkIlluminationsStack extends cdk.Stack {
       nodejsVersion: 20,
     });
 
-    new cdk.CfnOutput(this, 'DistributionDomainName', { value: distribution.distributionDomainName });
   }
 }
