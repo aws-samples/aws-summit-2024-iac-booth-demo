@@ -1,0 +1,33 @@
+{
+    "Stacks": [
+        {
+            "StackId": "arn:aws:cloudformation:us-east-1:288321069131:stack/CdkIlluminations/302372d0-1347-11ef-bac9-0affc9a81015",
+            "StackName": "CdkIlluminations",
+            "ChangeSetId": "arn:aws:cloudformation:us-east-1:288321069131:changeSet/cdk-deploy-change-set/e08b3268-70e4-4524-96d1-95b5639c02fc",
+            "Parameters": [
+                {
+                    "ParameterKey": "BootstrapVersion",
+                    "ParameterValue": "/cdk-bootstrap/hnb659fds/version",
+                    "ResolvedValue": "20"
+                }
+            ],
+            "CreationTime": "2024-05-16T05:43:14.695000+00:00",
+            "LastUpdatedTime": "2024-05-16T05:43:28.543000+00:00",
+            "RollbackConfiguration": {},
+            "StackStatus": "CREATE_IN_PROGRESS",
+            "DisableRollback": false,
+            "NotificationARNs": [],
+            "Capabilities": [
+                "CAPABILITY_IAM",
+                "CAPABILITY_NAMED_IAM",
+                "CAPABILITY_AUTO_EXPAND"
+            ],
+            "RoleARN": "arn:aws:iam::288321069131:role/cdk-hnb659fds-cfn-exec-role-288321069131-us-east-1",
+            "Tags": [],
+            "EnableTerminationProtection": false,
+            "DriftInformation": {
+                "StackDriftStatus": "NOT_CHECKED"
+            }
+        }
+    ]
+}

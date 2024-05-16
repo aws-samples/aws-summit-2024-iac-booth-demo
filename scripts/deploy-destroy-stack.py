@@ -51,7 +51,7 @@ if __name__ == '__main__':
             print('スタックの作成を開始します')
             try:
                 result = subprocess.run(
-                    ['npx', 'projen', 'deploy', '--require-approval', 'never'], text=True, check=True)
+                    ['npx', 'projen', 'deploy', target_stack_name, '--require-approval', 'never'], text=True, check=True)
             except Exception as e:
                 print(e.stderr)
             continue
@@ -59,9 +59,10 @@ if __name__ == '__main__':
         if check_stack_status_complete(cfn):
             # スタックのデプロイが完了している場合は削除を開始する
             print('スタックの作成が完了しました')
+            print('スタックの削除を開始します')
             try:
                 result = subprocess.run(
-                    ['npx', 'projen', 'destroy', '-f'], text=True, check=True)
+                    ['npx', 'projen', 'destroy', target_stack_name, '-f'], text=True, check=True)
             except Exception as e:
                 print(e.stderr)
             continue

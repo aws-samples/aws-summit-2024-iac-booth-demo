@@ -31,32 +31,40 @@ export class CdkIlluminationsStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda/')),
       handler: 'write_function.handler',
       runtime: lambda.Runtime.PYTHON_3_12,
+      functionName: 'CdkIlluminationsWriteFunction',
     });
 
     const readFunction = new lambda.Function(this, 'ReadFunction', {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda/')),
       handler: 'read_function.handler',
       runtime: lambda.Runtime.PYTHON_3_12,
+      functionName: 'CdkIlluminationsReadFunction',
     });
 
     const dynamoTable = new dynamodb.Table(this, 'DynamoTable', {
       partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      tableName: 'CdkIlluminationsTable',
     });
     dynamoTable.grantReadData(readFunction);
     dynamoTable.grantReadWriteData(writeFunction);
 
-    const cluster = new ecs.Cluster(this, 'Cluster', { vpc });
+    const cluster = new ecs.Cluster(this, 'Cluster', { vpc,
+      clusterName: 'CdkIlluminationsCluster',
+    });
     const loadBalancedFargateService = new ApplicationLoadBalancedFargateService(this, 'Service', {
       cluster,
       taskImageOptions: {
         image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
       },
+      serviceName: 'CdkIlluminationsService',
     });
     const deregistrationDelay = cdk.Duration.seconds(5);
     loadBalancedFargateService.targetGroup.setAttribute('deregistration_delay.timeout_seconds', deregistrationDelay.toSeconds().toString());
 
-    const api = new apigateway.RestApi(this, 'RestApi', {});
+    const api = new apigateway.RestApi(this, 'RestApi', {
+      restApiName: 'CdkIlluminationsApi',
+    });
     api.root.addMethod(
       'ANY',
       new apigateway.MockIntegration({
