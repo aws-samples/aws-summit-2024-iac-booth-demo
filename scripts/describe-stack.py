@@ -94,11 +94,11 @@ def is_target_resource(resource: dict) -> Tuple[bool, int]:
         'CdkIlluminationsReadFunction': 2,  # AWS::Lambda::Function
         'CdkIlluminationsTable': 3,  # AWS::DynamoDB::Table
         'loadbalancer': 4,  # AWS::ElasticLoadBalancingV2::LoadBalancer
-        'CdkIlluminationsService': 5,  # AWS::ECS::Service
+        'CdkIlluminationsCluster/CdkIlluminationsService': 5,  # AWS::ECS::Service
         'CdkIlluminationsCluster': 6,  # AWS::ECS::Cluster
         # CloudFront::Distribution
-        # VPC
-        # Stack
+        # EC2::VPC
+        # CloudFormation::Stack
     }
 
     for identifier, led_index in resource_identifier_led_mapping.items():
@@ -124,8 +124,8 @@ if __name__ == '__main__':
 
                 led_color = get_status_color(resource)
 
-                # print(f'ResourceType: {resource["ResourceType"]}, LogicalResourceId: {
-                #     resource["LogicalResourceId"]}, ResourceStatus: {resource['ResourceStatus']}')
+                print(f'ResourceType: {resource["ResourceType"]}, LogicalResourceId: {
+                     resource["LogicalResourceId"]}, ResourceStatus: {resource['ResourceStatus']}')
                 # LED 状態を変更する
                 change_color(led_index, led_color)
 
@@ -135,6 +135,6 @@ if __name__ == '__main__':
             # 全ての LED を OFF にする
             turn_off_all_leds()
 
+        print('------------------')
         # n 秒ごとに実行
         time.sleep(10)
-        print('------------------------')
