@@ -1,19 +1,11 @@
 # スタックと各リソースのデプロイ状況を監視し、LED を点滅させる
+from typing import Tuple
 import serial
 import time
 import boto3
 
 # 監視対象のスタック名
 target_stack_name = 'CdkIlluminations'
-
-# LED 管理用の処理
-# PORT = '/dev/cu.usbmodem1101'
-
-# ser = serial.Serial(PORT, 9600)
-
-
-def dummy_serial(code):
-    print('serial write:', code)
 
 
 class Color:
@@ -27,57 +19,60 @@ class Color:
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
 
+# LED 管理用の処理
+# PORT = '/dev/cu.usbmodem1101'
+
+# ser = serial.Serial(PORT, 9600)
+
 
 def change_color(led_index: int, color: tuple):
     code = ','.join(map(str, [led_index, color[0], color[1], color[2]])) + '\n'
     # ser.write(bytes(code, 'utf-8'))
-    dummy_serial(code)
+    dummy_change_color(code)
     time.sleep(0.11)
 
 
-# if __name__ == '__main__':
-#     change_color(0, Color.RED)
-#     change_color(1, Color.BLUE)
-#     change_color(2, Color.RED)
-#     change_color(3, Color.ORANGE)
-#     change_color(4, Color.YELLOW)
-#     # change_color(5, Color.GREEN)
-#     # change_color(6, Color.LIGHT_BLUE)
-#     # change_color(7, Color.BLUE)
-#     # change_color(8, Color.PURPLE)
-#     # change_color(9, Color.WHITE)
-
-#     while 1:
-#         change_color(0, Color.RED)
-#         change_color(0, Color.WHITE)
-
-# 監視対象のリソースタイプ
-target_resource_type = ['AWS::Lambda::Function', 'AWS::S3::Bucket',
-                        'AWS::CloudFront::Distribution', 'AWS::DynamoDB::Table', 'AWS::ApiGateway::RestApi',
-                        'AWS::EC2::VPC', 'AWS::ECS::Cluster', 'AWS::ElasticLoadBalancingV2::LoadBalancer',
-                        'AWS::ECS::Service']
-
-# リソースと LED の対応関係
-# PhysicalResourceId の一意に識別可能な部分文字列と LED インデックスの組合せ
-resource_identifier_led_mapping = {
-    's3deployment': 0,  # Custom::CDKBucketDeployment
-    'ANY': 1,  # AWS::ApiGateway::Method
-    'CdkIlluminationsReadFunction': 2,  # AWS::Lambda::Function
-    'CdkIlluminationsTable': 3, # AWS::DynamoDB::Table
-    'loadbalancer': 4, # AWS::ElasticLoadBalancingV2::LoadBalancer
-    'CdkIlluminationsService': 5, # AWS::ECS::Service
-    'CdkIlluminationsCluster': 6, # AWS::ECS::Cluster
-    # CloudFront::Distribution
-    # VPC
-    # Stack
-}
-
-# 自動的に作成される Lambda 関数は監視対象に含めたくない
-exclude_logical_resource_keywords = ['Custom']
-
-
-def is_target_resource(resource: str) -> bool:
+def dummy_change_color(code):
     '''
+    LED に繋いでいない時用の処理
+    '''
+    print("serial write:", code)
+
+
+def turn_off_all_leds():
+    '''
+    全ての LED を消灯する
+    '''
+
+    # LED の個数
+    LED_NUM = 10
+
+    for i in range(LED_NUM):
+        change_color(i, Color.BLACK)
+
+
+def get_status_color(resource: dict) -> Color:
+    '''
+    リソースを表す json を受け取り、ステータスに対応する LED カラーを返す
+    '''
+    # CloudFormation 上のステータスと色の対応関係 (割り当ては適当)
+    resource_status_color_mapping = {
+        'CREATE_COMPLETE': Color.BLUE,
+        'CREATE_IN_PROGRESS': Color.GREEN,
+        'CREATE_FAILED': Color.RED,
+        'DELETE_COMPLETE': Color.BLACK,
+        'DELETE_IN_PROGRESS': Color.ORANGE,
+        'DELETE_FAILED': Color.RED,
+    }
+
+    # ResourceStatus が対応関係にあるものなら対応表を参照して Color を決定、そうでなければ WHITE を返しておく
+    return resource_status_color_mapping.get(resource['ResourceStatus'], Color.WHITE)
+
+
+def is_target_resource(resource: dict) -> Tuple[bool, int]:
+    '''
+    リソースを表す json を受け取り、(監視対象のリソースか、そうならば何番目の LED に対応するか) を返す
+
     リソースの形式例
     {
         "LogicalResourceId": "DeploymentBucketC91A09DA",
@@ -90,27 +85,27 @@ def is_target_resource(resource: str) -> bool:
         }
     },
     '''
-    if resource['ResourceType'] not in target_resource_type:
-        return False
-    for keyword in exclude_logical_resource_keywords:
-        if keyword in resource['LogicalResourceId']:
-            return False
 
-    return True
+    # リソースと LED の対応関係
+    # PhysicalResourceId の一意に識別可能な部分文字列と LED インデックスの組合せ
+    resource_identifier_led_mapping = {
+        's3deployment': 0,  # Custom::CDKBucketDeployment
+        'ANY': 1,  # AWS::ApiGateway::Method
+        'CdkIlluminationsReadFunction': 2,  # AWS::Lambda::Function
+        'CdkIlluminationsTable': 3,  # AWS::DynamoDB::Table
+        'loadbalancer': 4,  # AWS::ElasticLoadBalancingV2::LoadBalancer
+        'CdkIlluminationsService': 5,  # AWS::ECS::Service
+        'CdkIlluminationsCluster': 6,  # AWS::ECS::Cluster
+        # CloudFront::Distribution
+        # VPC
+        # Stack
+    }
 
+    for identifier, led_index in resource_identifier_led_mapping.items():
+        if identifier in resource['PhysicalResourceId']:
+            return True, led_index
 
-# LED 状態変更用 dummy API
-def change_led_status(resource_id: str, resource_status: str):
-    '''
-    TODO: ボード上の LED とリソースの対応関係を何らかの方法でマッピングする必要がある
-    '''
-    print(f'Change LED status: {resource_id} {resource_status}')
-
-# 全ての LED を OFF にする dummy API
-
-
-def turn_off_all_leds():
-    print('Turn off all LEDs')
+    return False, -1
 
 
 if __name__ == '__main__':
@@ -123,19 +118,23 @@ if __name__ == '__main__':
             response = cfn.list_stack_resources(StackName=target_stack_name)
             resources = response['StackResourceSummaries']
             for resource in resources:
-                if not is_target_resource(resource):
+                is_target, led_index = is_target_resource(resource)
+                if not is_target:
                     continue
 
-                print(f'ResourceType: {resource["ResourceType"]}, LogicalResourceId: {
-                    resource["LogicalResourceId"]}, ResourceStatus: {resource['ResourceStatus']}')
+                led_color = get_status_color(resource)
+
+                # print(f'ResourceType: {resource["ResourceType"]}, LogicalResourceId: {
+                #     resource["LogicalResourceId"]}, ResourceStatus: {resource['ResourceStatus']}')
                 # LED 状態を変更する
-                # change_led_status(resource['LogicalResourceId'], resource['ResourceStatus'])
+                change_color(led_index, led_color)
 
         except Exception as e:
             # スタックが存在しない場合
             print(f'スタックが存在しません: {e}')
             # 全ての LED を OFF にする
-            # turn_off_all_leds()
+            turn_off_all_leds()
 
         # n 秒ごとに実行
-        time.sleep(5)
+        time.sleep(10)
+        print('------------------------')
