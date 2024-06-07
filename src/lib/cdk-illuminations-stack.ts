@@ -49,7 +49,8 @@ export class CdkIlluminationsStack extends cdk.Stack {
     dynamoTable.grantReadData(readFunction);
     dynamoTable.grantReadWriteData(writeFunction);
 
-    const cluster = new ecs.Cluster(this, 'Cluster', { vpc,
+    const cluster = new ecs.Cluster(this, 'Cluster', {
+      vpc,
       clusterName: 'CdkIlluminationsCluster',
     });
     const loadBalancedFargateService = new ApplicationLoadBalancedFargateService(this, 'Service', {

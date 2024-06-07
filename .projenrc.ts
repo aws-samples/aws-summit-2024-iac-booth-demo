@@ -9,6 +9,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
   // devDeps: [],             /* Build dependencies for this module. */
   // packageName: undefined,  /* The "name" in package.json. */
+  autoMerge: false,
 });
 project.tsconfigDev.include.push('src/**/*.tsx');
 project.tsconfigDev.include.push('integ-tests/*.ts');

@@ -10,7 +10,6 @@
 ## getting started
 
 ```
-npm ci
 npx projen deploy BaseStack
 ```
 

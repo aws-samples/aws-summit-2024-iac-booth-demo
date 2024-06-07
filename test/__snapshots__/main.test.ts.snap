@@ -204,6 +204,40 @@ exports[`Snapshot 1`] = `
         "PolicyDocument": {
           "Statement": [
             {
+              "Action": "s3:*",
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": {
+                "AWS": "*",
+              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "DeploymentBucketC91A09DA",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "DeploymentBucketC91A09DA",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
               "Action": [
                 "s3:PutBucketPolicy",
                 "s3:GetBucket*",
@@ -1214,6 +1248,9 @@ exports[`Snapshot 2`] = `
       "Type": "AWS::IAM::Policy",
     },
     "ClusterEB0386A7": {
+      "Properties": {
+        "ClusterName": "CdkIlluminationsCluster",
+      },
       "Type": "AWS::ECS::Cluster",
     },
     "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536": {
@@ -1396,6 +1433,7 @@ exports[`Snapshot 2`] = `
           "ReadCapacityUnits": 5,
           "WriteCapacityUnits": 5,
         },
+        "TableName": "CdkIlluminationsTable",
       },
       "Type": "AWS::DynamoDB::Table",
       "UpdateReplacePolicy": "Delete",
@@ -1493,6 +1531,7 @@ exports[`Snapshot 2`] = `
           },
           "S3Key": "f469ebd428ab682f7b1f668c2b940fef7ec0745c9229731957e0cf5755da04ff.zip",
         },
+        "FunctionName": "CdkIlluminationsReadFunction",
         "Handler": "read_function.handler",
         "Role": {
           "Fn::GetAtt": [
@@ -1577,7 +1616,7 @@ exports[`Snapshot 2`] = `
     },
     "RestApi0C43BF4B": {
       "Properties": {
-        "Name": "RestApi",
+        "Name": "CdkIlluminationsApi",
       },
       "Type": "AWS::ApiGateway::RestApi",
     },
@@ -1662,7 +1701,7 @@ exports[`Snapshot 2`] = `
       "Type": "AWS::IAM::Role",
       "UpdateReplacePolicy": "Retain",
     },
-    "RestApiDeployment180EC503fa00e3f974292c5aad7c0136fc14d066": {
+    "RestApiDeployment180EC503eaef44d18c43e88cd67606161f68a34f": {
       "DependsOn": [
         "RestApiANYA7C1DC94",
         "RestApicountGET05869255",
@@ -1683,7 +1722,7 @@ exports[`Snapshot 2`] = `
       ],
       "Properties": {
         "DeploymentId": {
-          "Ref": "RestApiDeployment180EC503fa00e3f974292c5aad7c0136fc14d066",
+          "Ref": "RestApiDeployment180EC503eaef44d18c43e88cd67606161f68a34f",
         },
         "RestApiId": {
           "Ref": "RestApi0C43BF4B",
@@ -1995,6 +2034,7 @@ exports[`Snapshot 2`] = `
             ],
           },
         },
+        "ServiceName": "CdkIlluminationsService",
         "TaskDefinition": {
           "Ref": "ServiceTaskDef1922A00F",
         },
@@ -2280,6 +2320,7 @@ exports[`Snapshot 2`] = `
           },
           "S3Key": "f469ebd428ab682f7b1f668c2b940fef7ec0745c9229731957e0cf5755da04ff.zip",
         },
+        "FunctionName": "CdkIlluminationsWriteFunction",
         "Handler": "write_function.handler",
         "Role": {
           "Fn::GetAtt": [
