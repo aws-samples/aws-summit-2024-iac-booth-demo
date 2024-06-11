@@ -37,7 +37,19 @@ export class BaseStack extends cdk.Stack {
       }],
     });
 
-    const vpc = new ec2.Vpc(this, 'Vpc', {});
+    const vpc = new ec2.Vpc(this, 'Vpc', {
+      subnetConfiguration: [
+        {
+          subnetType: ec2.SubnetType.PUBLIC,
+          name: 'Public',
+          mapPublicIpOnLaunch: false,
+        },
+        {
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+          name: 'Private',
+        },
+      ]
+    });
 
     this.vpc = vpc;
     this.deploymentBucket = deploymentBucket;
