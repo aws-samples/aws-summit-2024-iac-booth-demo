@@ -48,7 +48,7 @@ def turn_off_all_leds():
     '''
 
     # LED の個数
-    LED_NUM = 10
+    LED_NUM = 11
 
     for i in range(LED_NUM):
         change_color(i, Color.BLACK)
@@ -95,8 +95,8 @@ def get_stack_status_color(stack_status: str) -> Color:
 
 def get_stack_led_mapping(stack_name: str):
     stack_name_led_mapping = {
-        CDK_ILLUMINATIONS_STACK: 9,
-        BASE_STACK: 10,
+        CDK_ILLUMINATIONS_STACK: 6,
+        BASE_STACK: 7,
     }
 
 
@@ -120,22 +120,18 @@ def is_target_resource(resource: dict) -> Tuple[bool, int]:
     # リソースと LED の対応関係
     # PhysicalResourceId の一意に識別可能な部分文字列と LED インデックスの組合せ
     resource_identifier_led_mapping = {
-        's3deployment': 0,  # Custom::CDKBucketDeployment
+        's3deployment': 5,  # Custom::CDKBucketDeployment
         'ANY': 1,  # AWS::ApiGateway::Method
-        'CdkIlluminationsReadFunction': 2,  # AWS::Lambda::Function
-        'CdkIlluminationsTable': 3,  # AWS::DynamoDB::Table
-        'loadbalancer': 4,  # AWS::ElasticLoadBalancingV2::LoadBalancer
-        'CdkIlluminationsCluster/CdkIlluminationsService': 5,  # AWS::ECS::Service
-        'CdkIlluminationsCluster': 6,  # AWS::ECS::Cluster
-        # CloudFormation::Stack
-    }
-
-    resource_logical_id_led_mapping = {
-        'Distribution': 7  # CloudFront::Distribution
+        'CdkIlluminationsReadFunction': 4,  # AWS::Lambda::Function
+        'CdkIlluminationsTable': 8,  # AWS::DynamoDB::Table
+        'loadbalancer': 2,  # AWS::ElasticLoadBalancingV2::LoadBalancer
+        'CdkIlluminationsCluster/CdkIlluminationsService': 9,  # AWS::ECS::Service
+        'CdkIlluminationsCluster': 3,  # AWS::ECS::Cluster
     }
 
     resource_type_led_mapping = {
-        'AWS::EC2::VPC': 8  # EC2::VPC
+        'AWS::CloudFront::Distribution': 0,
+        #'AWS::EC2::VPC': 8  # EC2::VPC
     }
 
     for identifier, led_index in resource_identifier_led_mapping.items():
@@ -143,15 +139,6 @@ def is_target_resource(resource: dict) -> Tuple[bool, int]:
             continue
         try:
             if identifier in resource['PhysicalResourceId']:
-                return True, led_index
-        except Exception as e:
-            print(e, resource)
-
-    for identifier, led_index in resource_logical_id_led_mapping.items():
-        if 'LogicalResourceId' not in resource:
-            continue
-        try:
-            if identifier in resource['LogicalResourceId']:
                 return True, led_index
         except Exception as e:
             print(e, resource)
@@ -203,6 +190,7 @@ def apply_stack_status(stack_name: str):
     指定したスタックのステータスを確認し、LED の色を変更する
     '''
     # スタック情報を取得
+    led_index = get_stack_led_mapping(stack_name)
     try:
         response = cfn.describe_stacks(StackName=stack_name)
         stack = response['Stacks'][0]
@@ -210,12 +198,12 @@ def apply_stack_status(stack_name: str):
         print(f'StackName: {stack_name}, StackStatus: {stack_status}')
         led_color = get_stack_status_color(stack_status)
         # LED 状態を変更する
-        led_index = get_stack_led_mapping(stack_name)
         change_color(led_index, led_color)
 
     except Exception as e:
         # スタックが存在しない場合
         print(f'スタックが存在しません: {e}')
+        change_color(led_index, Color.BLACK)
         # 全ての LED を OFF にする
         # turn_off_all_leds()
 
