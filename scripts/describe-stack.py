@@ -98,6 +98,7 @@ def get_stack_led_mapping(stack_name: str):
         CDK_ILLUMINATIONS_STACK: 6,
         BASE_STACK: 7,
     }
+    return stack_name_led_mapping.get(stack_name, -1)
 
 
 def is_target_resource(resource: dict) -> Tuple[bool, int]:
