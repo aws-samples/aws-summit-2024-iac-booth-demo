@@ -3,7 +3,6 @@
 !/.projen/tasks.json
 !/.projen/deps.json
 !/.projen/files.json
-!/.github/workflows/pull-request-lint.yml
 !/package.json
 !/LICENSE
 !/.npmignore
@@ -33,9 +32,6 @@ jspm_packages/
 /test-reports/
 junit.xml
 /coverage/
-!/.github/workflows/build.yml
-!/.github/workflows/upgrade.yml
-!/.github/pull_request_template.md
 !/test/
 !/tsconfig.json
 !/tsconfig.dev.json

@@ -3,6 +3,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   cdkVersion: '2.1.0',
   defaultReleaseBranch: 'main',
   name: 'cdk-illuminations-summit2024',
+  github: false,
   projenrcTs: true,
   deps: ['deploy-time-build', '@aws-cdk/integ-tests-alpha@^2.137.0-alpha.0', '@aws-cdk/integ-runner@^2.137.0-alpha.0'],
   // deps: [],                /* Runtime dependencies of this module. */
