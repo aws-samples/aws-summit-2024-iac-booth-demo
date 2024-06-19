@@ -9,11 +9,13 @@
 
 ### Amazon Simple Queue Service (Amazon SQS) で Dead Letter Queue を設定するデモ
 
-![Amazon Simple Queue Service (Amazon SQS) で Dead Letter Queue を設定するデモ](./docs/sqs-demo.mp4)
+
+https://github.com/WinterYukky/aws-summit-2024-iac-booth-demo/assets/49480575/5d915bfd-23d4-43de-9357-ef1c75b416b0
+
 
 ### Amazon Simple Storage Service (Amazon S3) と Amazon CloudFront のフロントエンドアプリケーションのデモ
 
-![Amazon Simple Storage Service (Amazon S3) と Amazon CloudFront のフロントエンドアプリケーションのデモ](./docs/frontend-demo.mp4)
+https://github.com/WinterYukky/aws-summit-2024-iac-booth-demo/assets/49480575/23f0a3c4-2a28-462d-bdcb-90c14b6ff480
 
 ## 利用方法
 
