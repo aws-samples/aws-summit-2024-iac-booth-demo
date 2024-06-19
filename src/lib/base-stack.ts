@@ -48,7 +48,7 @@ export class BaseStack extends cdk.Stack {
           subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
           name: 'Private',
         },
-      ]
+      ],
     });
 
     this.vpc = vpc;
